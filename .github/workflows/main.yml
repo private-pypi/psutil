@@ -73,7 +73,7 @@ jobs:
         PSUTIL_TGZ="$(mktemp -d)/psutil-release.tar.gz"
         PSUTIL_URL="https://github.com/giampaolo/psutil/archive/release-${{ matrix.psutil_version }}.tar.gz"
 
-        curl -L -J --output "$PSUTIL_TGZ" "$PSUTIL_URL"
+        curl -L --output "$PSUTIL_TGZ" "$PSUTIL_URL"
         tar -xzf "$PSUTIL_TGZ" -C . --strip-components=1
 
     - name: Build wheel
