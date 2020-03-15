@@ -62,11 +62,20 @@ jobs:
   runs-on: macos-10.15
   strategy:
     matrix:
+      python_version:
+        - "2.7"
+        - "3.5"
+        - "3.6"
+        - "3.7"
+        - "3.8"
       psutil_version:
         - "5.7.0"
+        - "5.6.7"
   steps:
     - name: Setup python
       uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python_version }}
 
     - name: Setup pip
       run: |
