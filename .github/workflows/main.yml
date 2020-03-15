@@ -15,12 +15,15 @@ jobs:
         - "quay.io/pypa/manylinux2010_x86_64"
         - "quay.io/pypa/manylinux2010_i686"
       python_abi:
+        - "cp27-cp27m"
+        - "cp27-cp27mu"
         - "cp35-cp35m"
         - "cp36-cp36m"
         - "cp37-cp37m"
         - "cp38-cp38"
       psutil_version:
         - "5.7.0"
+        - "5.6.7"
   container:
     image: ${{ matrix.image }}
   steps:
@@ -45,7 +48,9 @@ jobs:
         tar -xzf "$PSUTIL_TGZ" -C . --strip-components=1
 
     - name: Build wheel
-      run: python setup.py build bdist_wheel
+      run: |
+        python setup.py build
+        python setup.py bdist_wheel --plat-name $(echo ${{ matrix.image }} | awk -F'/' '{print $(NF)}')
 
     - name: Upload distribution
       uses: actions/upload-artifact@v1
@@ -77,7 +82,9 @@ jobs:
         tar -xzf "$PSUTIL_TGZ" -C . --strip-components=1
 
     - name: Build wheel
-      run: python setup.py build bdist_wheel
+      run: |
+        python setup.py build
+        python setup.py bdist_wheel
 
     - name: Upload distribution
       uses: actions/upload-artifact@v1
