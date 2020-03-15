@@ -1,0 +1,117 @@
+name: build-and-publish
+
+on:
+ push:
+
+jobs:
+
+ build-linux:
+  runs-on: ubuntu-latest
+  strategy:
+    matrix:
+      image:
+        # - "quay.io/pypa/manylinux1_x86_64"
+        # - "quay.io/pypa/manylinux1_i686"
+        - "quay.io/pypa/manylinux2010_x86_64"
+        - "quay.io/pypa/manylinux2010_i686"
+      python_abi:
+        - "cp35-cp35m"
+        - "cp36-cp36m"
+        - "cp37-cp37m"
+        - "cp38-cp38"
+      psutil_version:
+        - "5.7.0"
+  container:
+    image: ${{ matrix.image }}
+  steps:
+    - name: Setup python/pip
+      run: |
+        rm -f /usr/bin/python
+        update-alternatives --install /usr/bin/python python /opt/python/${{ matrix.python_abi }}/bin/python 0
+        python --version
+
+        rm -f /usr/bin/pip
+        update-alternatives --install /usr/bin/pip pip /opt/python/${{ matrix.python_abi }}/bin/pip 0
+        pip --version
+
+        pip install -U pip wheel
+
+    - name: Download the source code.
+      run: |
+        PSUTIL_TGZ="$(mktemp -d)/psutil-release.tar.gz"
+        PSUTIL_URL="https://github.com/giampaolo/psutil/archive/release-${{ matrix.psutil_version }}.tar.gz"
+
+        curl -L -J --output "$PSUTIL_TGZ" "$PSUTIL_URL"
+        tar -xzf "$PSUTIL_TGZ" -C . --strip-components=1
+
+    - name: Build wheel
+      run: python setup.py build bdist_wheel
+
+    - name: Upload distribution
+      uses: actions/upload-artifact@v1
+      with:
+        name: distribution
+        path: dist/
+
+ build-macos:
+  needs: checkout
+  runs-on: macos-10.15
+  strategy:
+    matrix:
+      psutil_version:
+        - "5.7.0"
+  steps:
+    - name: Setup python
+      uses: actions/setup-python@v1
+
+    - name: Setup pip
+      run: |
+        pip install -U pip wheel
+        pip --version
+
+    - name: Download the source code.
+      run: |
+        PSUTIL_TGZ="$(mktemp -d)/psutil-release.tar.gz"
+        PSUTIL_URL="https://github.com/giampaolo/psutil/archive/release-${{ matrix.psutil_version }}.tar.gz"
+
+        curl -L -J --output "$PSUTIL_TGZ" "$PSUTIL_URL"
+        tar -xzf "$PSUTIL_TGZ" -C . --strip-components=1
+
+    - name: Build wheel
+      run: python setup.py build bdist_wheel
+
+    - name: Upload distribution
+      uses: actions/upload-artifact@v1
+      with:
+        name: distribution
+        path: dist/
+
+
+ publish:
+  needs: [build-linux, build-macos]
+  runs-on: ubuntu-latest
+  steps:
+    - name: Download distribution
+      uses: actions/download-artifact@v1
+      with:
+        name: distribution
+        path: dist/
+
+    - name: Show
+      run: ls -alh dist/
+
+    # - name: Setup python
+    #   uses: actions/setup-python@v1
+
+    # - name: Setup pip/twine
+    #   run: |
+    #     pip install -U pip twine
+    #     pip --version
+    #     twine --version
+
+    # - name: Upload distributions
+    #   run: |
+    #     twine upload dist/*
+    #   env:
+    #     TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+    #     TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
