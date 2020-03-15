@@ -3,6 +3,9 @@ name: build-and-publish
 on:
  push:
 
+env:
+  PSUTIL_VERSION: "5.7.0"
+
 jobs:
 
  build-linux:
@@ -21,9 +24,6 @@ jobs:
         - "cp36-cp36m"
         - "cp37-cp37m"
         - "cp38-cp38"
-      psutil_version:
-        - "5.7.0"
-        - "5.6.7"
   container:
     image: ${{ matrix.image }}
   steps:
@@ -42,7 +42,7 @@ jobs:
     - name: Download the source code.
       run: |
         PSUTIL_TGZ="$(mktemp -d)/psutil-release.tar.gz"
-        PSUTIL_URL="https://github.com/giampaolo/psutil/archive/release-${{ matrix.psutil_version }}.tar.gz"
+        PSUTIL_URL="https://github.com/giampaolo/psutil/archive/release-${{ env.PSUTIL_VERSION }}.tar.gz"
 
         curl -L --output "$PSUTIL_TGZ" "$PSUTIL_URL"
         tar -xzf "$PSUTIL_TGZ" -C . --strip-components=1
@@ -68,9 +68,6 @@ jobs:
         - "3.6"
         - "3.7"
         - "3.8"
-      psutil_version:
-        - "5.7.0"
-        - "5.6.7"
   steps:
     - name: Setup python
       uses: actions/setup-python@v1
@@ -85,7 +82,7 @@ jobs:
     - name: Download the source code.
       run: |
         PSUTIL_TGZ="$(mktemp -d)/psutil-release.tar.gz"
-        PSUTIL_URL="https://github.com/giampaolo/psutil/archive/release-${{ matrix.psutil_version }}.tar.gz"
+        PSUTIL_URL="https://github.com/giampaolo/psutil/archive/release-${{ env.PSUTIL_VERSION }}.tar.gz"
 
         curl -L --output "$PSUTIL_TGZ" "$PSUTIL_URL"
         tar -xzf "$PSUTIL_TGZ" -C . --strip-components=1
