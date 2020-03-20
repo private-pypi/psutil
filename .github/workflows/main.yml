@@ -10,8 +10,26 @@ jobs:
  debug:
   runs-on: ubuntu-latest
   steps:
+    - uses: actions/checkout@v2
+
     - name: Run private-pypi
-      run: docker run hello-world
+      run: |
+        docker run \
+          --name private-pypi \
+          -d \
+          -v $(pwd)/private-pypi:/private-pypi \
+          -v $(mktemp -d):/private-pypi-root \
+          -p 8888:8888 \
+          privatepypi/private-pypi:0.1.0a5
+      env:
+        PRIVATE_PYPI_COMMAND: server
+        PRIVATE_PYPI_COMMAND_CONFIG: /private-pypi/config.toml
+        PRIVATE_PYPI_COMMAND_ROOT: /private-pypi-root
+        PRIVATE_PYPI_COMMAND_ADMIN_SECRET: /private-pypi/admin_secret.toml
+    
+    - name: DEBUG
+      run: docker logs private-pypi
+
 
 #  build-linux:
 #   runs-on: ubuntu-latest
