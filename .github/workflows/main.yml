@@ -13,8 +13,6 @@ jobs:
   strategy:
     matrix:
       image:
-        - "quay.io/pypa/manylinux1_x86_64"
-        - "quay.io/pypa/manylinux1_i686"
         - "quay.io/pypa/manylinux2010_x86_64"
         - "quay.io/pypa/manylinux2010_i686"
       python_abi:
@@ -101,7 +99,7 @@ jobs:
  publish:
   needs: [build-linux, build-macos]
   runs-on: ubuntu-latest
-    services:
+  services:
     private-pypi:
       image: privatepypi/private-pypi:0.1.0a8
       ports:
