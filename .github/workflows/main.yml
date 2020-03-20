@@ -139,7 +139,7 @@ jobs:
 
     - name: Upload distributions
       run: |
-        twine upload --skip-existing --repository-url http://localhost:8888/simple/ dist/*
+        twine upload --skip-existing --repository-url http://localhost:8888/simple/ --verbose dist/*
       env:
         TWINE_USERNAME: private-pypi-pkg-repo
         TWINE_PASSWORD: ${{ secrets.PRIVATE_PYPI_PKG_REPO_TOKEN }}
