@@ -14,10 +14,10 @@ jobs:
 
     - name: Run private-pypi
       run: |
-        sudo docker run \
+        docker run \
           --name private-pypi \
           -d \
-          --privileged \
+          -u root \
           -v $(pwd)/private-pypi:/private-pypi \
           -v $(mktemp -d):/private-pypi-root \
           -p 8888:8888 \
