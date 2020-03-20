@@ -19,6 +19,8 @@ jobs:
       env:
         PRIVATE_PYPI_COMMAND: server
         PRIVATE_PYPI_COMMAND_ROOT: /private-pypi-root
+      options:
+        name: private-pypi
   steps:
     - uses: actions/checkout@v2
 
