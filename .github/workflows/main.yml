@@ -100,7 +100,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       private-pypi:
-        image: privatepypi/private-pypi:0.1.0a8
+        image: privatepypi/private-pypi:0.1.0a9
         ports:
           - 8888:8888
         volumes:
