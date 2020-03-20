@@ -42,9 +42,9 @@ jobs:
 
     - name: DEBUG
       run: |
-        mkdir -p /backup
-        docker run --rm -v private-pypi-root:/volume -v /backup:/backup busybox sh -c 'cp -r /volume /backup'
-        ls -alh /backup
+        mkdir -p backup
+        docker run --rm -v private-pypi-root:/volume -v $(pwd)/backup:/backup busybox sh -c 'cp -r /volume /backup'
+        ls -alh backup
 
 #  build-linux:
 #   runs-on: ubuntu-latest
