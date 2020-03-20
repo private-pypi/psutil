@@ -9,24 +9,30 @@ env:
 jobs:
  debug:
   runs-on: ubuntu-latest
+  services:
+    private-pypi:
+      image: privatepypi/private-pypi:0.1.0a7
+      ports:
+        - 8888:8888
+      volumes:
+        - private-pypi-root:/private-pypi-root
+      env:
+        PRIVATE_PYPI_COMMAND: server
+        PRIVATE_PYPI_COMMAND_ROOT: /private-pypi-root
   steps:
     - uses: actions/checkout@v2
 
-    - name: Run private-pypi
+    - name: Setup private-pypi
       run: |
-        docker run \
-          --name private-pypi \
-          -d \
-          -u root \
-          -v $(pwd)/private-pypi:/private-pypi \
-          -v $(mktemp -d):/private-pypi-root \
-          -p 32676:32676 \
-          --env-file $(pwd)/private-pypi/private-pypi.env \
-          --env PRIVATE_PYPI_PKG_REPO_TOKEN=${{ secrets.PRIVATE_PYPI_PKG_REPO_TOKEN }} \
-          privatepypi/private-pypi:0.1.0a6
-    
+        sed -i.bak 's/PRIVATE_PYPI_PKG_REPO_TOKEN/${{ secrets.PRIVATE_PYPI_PKG_REPO_TOKEN }}/g' private-pypi/admin_secret.toml
+
+        curl \
+          -F "config.toml=@$(pwd)/private-pypi/config.toml" \
+          -F "admin_secret.toml=@$(pwd)/private-pypi/admin_secret.toml" \
+          http://localhost:8888/reload/
+
     - name: DEBUG
-      run: sleep 30 && docker logs private-pypi
+      run: docker logs private-pypi
 
 
 #  build-linux:
