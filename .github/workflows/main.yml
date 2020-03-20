@@ -20,6 +20,7 @@ jobs:
           -v $(pwd)/private-pypi:/private-pypi \
           -v $(mktemp -d):/private-pypi-root \
           --env-file $(pwd)/private-pypi/private-pypi.env \
+          --env PRIVATE_PYPI_PKG_REPO_TOKEN=${{ secrets.PRIVATE_PYPI_PKG_REPO_TOKEN }} \ 
           -p 8888:8888 \
           privatepypi/private-pypi:0.1.0a5
     
