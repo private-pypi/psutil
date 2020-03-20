@@ -28,7 +28,7 @@ jobs:
         PRIVATE_PYPI_COMMAND_ADMIN_SECRET: /private-pypi/admin_secret.toml
     
     - name: DEBUG
-      run: docker logs private-pypi
+      run: sleep 30 && docker logs private-pypi
 
 
 #  build-linux:
