@@ -17,6 +17,7 @@ jobs:
         sudo docker run \
           --name private-pypi \
           -d \
+          --privileged \
           -v $(pwd)/private-pypi:/private-pypi \
           -v $(mktemp -d):/private-pypi-root \
           -p 8888:8888 \
