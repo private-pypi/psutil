@@ -137,9 +137,9 @@ jobs:
         pip --version
         twine --version
 
-    # - name: Upload distributions
-    #   run: |
-    #     twine upload dist/*
-    #   env:
-    #     TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-    #     TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+    - name: Upload distributions
+      run: |
+        twine upload --skip-existing --repository-url http://localhost:8888/simple dist/*
+      env:
+        TWINE_USERNAME: private-pypi-pkg-repo
+        TWINE_PASSWORD: ${{ secrets.PRIVATE_PYPI_PKG_REPO_TOKEN }}
