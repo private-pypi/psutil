@@ -1,0 +1,4 @@
+[private-pypi-pkg-repo]
+type = "github"
+owner = "private-pypi"
+repo = "private-pypi-pkg-repo"
