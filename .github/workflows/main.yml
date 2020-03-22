@@ -23,6 +23,7 @@ jobs:
           - "cp38-cp38"
     container:
       image: ${{ matrix.image }}
+
     steps:
       - name: Setup python/pip
         run: |
@@ -65,6 +66,7 @@ jobs:
           - "3.6"
           - "3.7"
           - "3.8"
+
     steps:
       - name: Setup python
         uses: actions/setup-python@v1
@@ -100,7 +102,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       private-pypi:
-        image: privatepypi/private-pypi:0.1.0a9
+        image: privatepypi/private-pypi:0.1.0a14
         ports:
           - 8888:8888
         volumes:
@@ -109,17 +111,26 @@ jobs:
           PRIVATE_PYPI_COMMAND: server
           PRIVATE_PYPI_COMMAND_ROOT: /private-pypi-root
           PRIVATE_PYPI_COMMAND_HOST: 0.0.0.0
+
     steps:
       - uses: actions/checkout@v2
 
       - name: Setup private-pypi
         run: |
-          sed -i.bak 's/PRIVATE_PYPI_PKG_REPO_TOKEN/${{ secrets.PRIVATE_PYPI_PKG_REPO_TOKEN }}/g' private-pypi/admin_secret.toml
-
           curl \
-            -F "config.toml=@$(pwd)/private-pypi/config.toml" \
-            -F "admin_secret.toml=@$(pwd)/private-pypi/admin_secret.toml" \
-            http://localhost:8888/reload/
+            -d "config=${CONFIG}&admin_secret=${ADMIN_SECRET}" \
+            -X POST \
+            http://localhost:8888/initialize/
+        env:
+          CONFIG: |
+            [private-pypi-pkg-repo]
+            type = "github"
+            owner = "private-pypi"
+            repo = "private-pypi-pkg-repo"
+          ADMIN_SECRET: |
+            [private-pypi-pkg-repo]
+            type = "github"
+            raw = "${{ secrets.PRIVATE_PYPI_PKG_REPO_TOKEN }}"
 
       - name: Download distribution
         uses: actions/download-artifact@v1
@@ -133,8 +144,6 @@ jobs:
       - name: Setup pip/twine
         run: |
           pip install -U pip twine
-          pip --version
-          twine --version
 
       - name: Upload distributions
         run: |
